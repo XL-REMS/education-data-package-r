@@ -6,6 +6,7 @@
 #' @param by Optional 'list' of grouping parameters to pass to an API call
 #' @param filters Optional 'list' of query values to filter an API call
 #' @param add_labels Add variable labels (when applicable)? Defaults to FALSE.
+#' @param parallel Retrieve data in parallel? Defaults to FALSE.
 #'
 #' @return A `data.frame` of education data
 #'
@@ -20,7 +21,8 @@ get_education_data <- function(level = NULL,
                                topic = NULL,
                                by = NULL,
                                filters = NULL,
-                               add_labels = FALSE) {
+                               add_labels = FALSE,
+                               parallel = FALSE) {
 
   endpoints <- validate_function_args(level = level,
                                       source = source,
@@ -33,7 +35,7 @@ get_education_data <- function(level = NULL,
                         required_vars = required_vars,
                         filters  = filters)
 
-  df <- get_all_data(urls)
+  df <- get_all_data(urls, parallel)
 
   if(add_labels & nrow(df) != 0) {
     df <- add_variable_labels(endpoints, df)

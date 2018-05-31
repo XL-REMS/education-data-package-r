@@ -59,8 +59,20 @@ get_year_data <- function(url) {
 # retrieve results from all pages of an api query across all given years
 #
 # returns data.frame
-get_all_data <- function(urls) {
-  dfs <- lapply(urls, get_year_data)
+get_all_data <- function(urls, parallel) {
+  ncores <- parallel::detectCores(logical = FALSE)
+  if (parallel & (ncores > 1)) {
+    message('Retrieving data in parallel across ', ncores, ' cores...')
+    cl <- parallel::makeCluster(ncores)
+    dfs <- parallel::parLapplyLB(cl, urls, get_year_data)
+    parallel::stopCluster(cl)
+  } else {
+    dfs <- lapply(urls, get_year_data)
+  }
+  #cl <- parallel::makeCluster(6)
+  #dfs <- parallel::parLapplyLB(cl, urls, get_year_data)
+  #parallel::stopCluster(cl)
+  #future::plan(sequential)
   df <- do.call(rbind, dfs)
   return(df)
 }
